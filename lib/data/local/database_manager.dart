@@ -70,7 +70,7 @@ class DatabaseManager {
         whereArgs: [id],
       ))
           .first;
-    } on Exception {
+    } catch (e) {
       return null;
     }
   }

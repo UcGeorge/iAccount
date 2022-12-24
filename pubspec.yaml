@@ -29,11 +29,14 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  animated_flip_counter: ^0.2.5
   cupertino_icons: ^1.0.2
   equatable: ^2.0.5
+  flex_color_scheme: ^6.1.1
   flutter:
     sdk: flutter
   google_fonts: ^3.0.1
+  intl: ^0.18.0
   logging: ^1.1.0
   path: ^1.8.3
   shared_preferences: ^2.0.15

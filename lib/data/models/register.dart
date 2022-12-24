@@ -1,33 +1,31 @@
 import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 import '../local/database_manager.dart';
 
 class Register extends Equatable {
-  const Register({
-    required this.dateModified,
+  Register({
     required this.fifty,
     required this.five,
     required this.fiveHundred,
-    required this.id,
     required this.oneHundred,
     required this.oneThousand,
     required this.ten,
     required this.twenty,
     required this.twoHundred,
-  });
+  })  : id = DateFormat.yMMMEd().format(DateTime.now()),
+        dateModified = DateTime.now();
 
   factory Register.fromJson(String source) =>
       Register.fromMap(json.decode(source));
 
   factory Register.fromMap(Map<String, dynamic> map) {
     return Register(
-      dateModified: DateTime.parse(map['dateModified']),
       fifty: map['fifty']?.toInt() ?? 0,
       five: map['five']?.toInt() ?? 0,
       fiveHundred: map['fiveHundred']?.toInt() ?? 0,
-      id: map['id'] ?? '',
       oneHundred: map['oneHundred']?.toInt() ?? 0,
       oneThousand: map['oneThousand']?.toInt() ?? 0,
       ten: map['ten']?.toInt() ?? 0,
@@ -35,6 +33,17 @@ class Register extends Equatable {
       twoHundred: map['twoHundred']?.toInt() ?? 0,
     );
   }
+
+  factory Register.zero() => Register(
+        fifty: 0,
+        five: 0,
+        fiveHundred: 0,
+        oneHundred: 0,
+        oneThousand: 0,
+        ten: 0,
+        twenty: 0,
+        twoHundred: 0,
+      );
 
   final DateTime dateModified;
   final int fifty;
@@ -55,12 +64,20 @@ class Register extends Equatable {
     return 'Register(dateModified: $dateModified, fifty: $fifty, five: $five, fiveHundred: $fiveHundred, id: $id, oneHundred: $oneHundred, oneThousand: $oneThousand, ten: $ten, twenty: $twenty, twoHundred: $twoHundred)';
   }
 
+  int get total =>
+      (oneThousand * 1000) +
+      (fiveHundred * 500) +
+      (twoHundred * 200) +
+      (oneHundred * 100) +
+      (fifty * 50) +
+      (twenty * 20) +
+      (ten * 10) +
+      (five * 5);
+
   Register copyWith({
-    DateTime? dateModified,
     int? fifty,
     int? five,
     int? fiveHundred,
-    String? id,
     int? oneHundred,
     int? oneThousand,
     int? ten,
@@ -68,16 +85,40 @@ class Register extends Equatable {
     int? twoHundred,
   }) {
     return Register(
-      dateModified: dateModified ?? this.dateModified,
       fifty: fifty ?? this.fifty,
       five: five ?? this.five,
       fiveHundred: fiveHundred ?? this.fiveHundred,
-      id: id ?? this.id,
       oneHundred: oneHundred ?? this.oneHundred,
       oneThousand: oneThousand ?? this.oneThousand,
       ten: ten ?? this.ten,
       twenty: twenty ?? this.twenty,
       twoHundred: twoHundred ?? this.twoHundred,
+    );
+  }
+
+  Register increment(Register register) {
+    return Register(
+      fifty: register.fifty + fifty,
+      five: register.five + five,
+      fiveHundred: register.fiveHundred + fiveHundred,
+      oneHundred: register.oneHundred + oneHundred,
+      oneThousand: register.oneThousand + oneThousand,
+      ten: register.ten + ten,
+      twenty: register.twenty + twenty,
+      twoHundred: register.twoHundred + twoHundred,
+    );
+  }
+
+  Register decrement(Register register) {
+    return Register(
+      fifty: fifty - register.fifty,
+      five: five - register.five,
+      fiveHundred: fiveHundred - register.fiveHundred,
+      oneHundred: oneHundred - register.oneHundred,
+      oneThousand: oneThousand - register.oneThousand,
+      ten: ten - register.ten,
+      twenty: twenty - register.twenty,
+      twoHundred: twoHundred - register.twoHundred,
     );
   }
 
@@ -97,6 +138,20 @@ class Register extends Equatable {
   }
 
   String toJson() => json.encode(toMap());
+
+  static Future<void> append(
+    Register register, {
+    required bool take,
+  }) async {
+    final Register? currentRecord = await get(register.id);
+    if (currentRecord == null) {
+      return await insert(register);
+    } else {
+      return await update(take
+          ? currentRecord.increment(register)
+          : currentRecord.decrement(register));
+    }
+  }
 
   static Future<void> insert(Register register) async =>
       DatabaseManager.insert(register.toMap(), table: "register");
