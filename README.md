@@ -7,3 +7,9 @@ Welcome to the Cash Register Counter mobile app! This app allows cashiers to eas
 - Easy-to-use interface for quickly adding and subtracting the number of each currency in the cash register
 - Accounting summary at the end of the work day to facilitate end-of-day reconciliation
 - Customizable currency denominations to support a variety of countries and regions
+
+## Releases
+
+| Release | Description |
+|---------|-------------|
+| [v1.0-beta](https://github.com/UcGeorge/iAccount/releases/tag/v1.0-beta)    | Initial bata release |
